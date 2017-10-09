@@ -291,7 +291,7 @@ var usr = new User("ggg", 78) //=> User {name: "ggg", age: 78}
 usr.getName() //=> "ggg"
 ```
 
-- usr 自体は getName() をもっていないが、protorype を通して定義されたメソッドが参照できている
+- usr 自体は getName() をもっていないが、prototype を通して定義されたメソッドが参照できている
 
 ## データ型
 - JSのデータ型は大きく分けて「基本型(プリミティブ型)」と「参照型」に分類される
@@ -509,6 +509,24 @@ aaa instanceof hoge //=> true
 
 ## constructor
 - コンストラクタから生成されたオブジェクトは constructor に生成に使用したコンストラクタ関数を保持している
+  - ちなみに、この constructor はオブジェクトが参照しているコンストラクタ関数のプロトタイププロパティの値として存在する
+
+```js
+function Tes() {}
+
+var tes = new Tes
+
+tes.__proto__ //=> {constructor: ƒ}
+Tes.prototype //=> {constructor: ƒ}
+
+tes.__proto__ === Tes.prototype //=> true
+
+tes.constructor //=> ƒ Tes(){}
+Tes.prototype.constructor //=> ƒ Tes(){}
+
+// 以上から、 tes.constructor は Tes.prototype.constructor を参照していることがわかる
+```
+
 - instanceof と異なり、コンストラクタの種類が判定できるため「出所不明」なオブジェクトの詳細を調べる際に使える
 
 ```js
