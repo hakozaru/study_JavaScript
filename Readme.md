@@ -87,6 +87,9 @@ user.getInfo = function() { //=> メソッド
 ## 関数
 - JSの関数は通常のオブジェクトと同じ振る舞いが可能(第1級オブジェクト、ファーストクラス関数などと呼ばれるらしい)
 - 変数や配列に代入ができ、パラメータ(引数)として利用することも可能
+- `function hoge() {` から `}` までが関数の「宣言」で、 `hoge()` で関数を「呼び出す」
+- 関数から何か戻り値を返す場合は `return` で指定する。 指定しなかった場合は `undefined` が戻り値となる
+- 関数名に `()` をつけて呼ぶと関数の呼び出しとなり、 `()` をつけないで呼び出すと関数を参照するだけで実行はされない
 
 ```js
 // 関数宣言
@@ -112,7 +115,7 @@ function func2(func) {
 func2(f1) //=> あああ
 ```
 
-- 通常のオブジェクトと同じ振る舞いが可能なので、メンバを動的に操作可能
+- 通常のオブジェクトと同じ振る舞いが可能なので、メンバを動的に操作可能(非推奨)
 
 ```js
 var f3 = function() {
@@ -160,6 +163,19 @@ var bbb = Test()
 bbb //=> undefined
 ```
 
+- オブジェクトのプロパティとして指定される関数をメソッドと呼ぶ
+- メソッドはES6から省略記法が追加された
+
+```js
+const obj = {
+  name: "hoge",
+  test() { return "Test func!" }
+  // old: function() { return "Old ver!" } 以前はこう
+}
+
+obj.test() //=> "Test func!"
+```
+
 ## 引数
 - JSは引数チェックを一切行わない
 - 多く渡しても、少なく渡してもエラーは発生しない
@@ -192,6 +208,21 @@ func7(5, 8, 1) //=> 5
 ```
 
 - arguments は配列っぽい動作をするが配列とは別物なので注意
+- ES6からスプレッド演算子(展開演算子)が導入されたのでそちらを使った方が扱いに悩む必要がないのでおすすめ
+
+```js
+function hoge(...aaa) {
+  console.log(aaa)
+}
+
+hoge(1,2,3,4,5) //=> (5) [1, 2, 3, 4, 5]
+
+function hoge(...aaa) {
+  console.log(...aaa)
+}
+
+hoge(1,2,3,4,5) //=> 1 2 3 4 5
+```
 
 ## 無名関数
 - JSでは関数名が必要なければ省略が可能
@@ -357,6 +388,48 @@ usr.getName() //=> "ggg"
 
 - usr 自体は getName() をもっていないが、prototype を通して定義されたメソッドが参照できている
 
+## constructor
+- コンストラクタから生成されたオブジェクトは constructor に生成に使用したコンストラクタ関数を保持している
+  - ちなみに、この constructor はオブジェクトが参照しているコンストラクタ関数のプロトタイププロパティの値として存在する
+
+```js
+function Tes() {}
+
+var tes = new Tes
+
+tes.__proto__ //=> {constructor: ƒ}
+Tes.prototype //=> {constructor: ƒ}
+
+tes.__proto__ === Tes.prototype //=> true
+
+tes.constructor //=> ƒ Tes(){}
+Tes.prototype.constructor //=> ƒ Tes(){}
+
+// 以上から、 tes.constructor は Tes.prototype.constructor を参照していることがわかる
+```
+
+- instanceof と異なり、コンストラクタの種類が判定できるため「出所不明」なオブジェクトの詳細を調べる際に使える
+
+```js
+var a = []
+var b = {}
+var c = function() {}
+
+a.constructor //=> ƒ Array() { [native code] }
+b.constructor //=> ƒ Object() { [native code] }
+c.constructor //=> ƒ Function() { [native code] }
+
+// 自作のコンストラクタ
+var Myf1 = function() {}
+var aaa = new Myf1
+aaa.constructor //=> ƒ () {} (無名関数なので名前が表示されない)
+
+// 名前が欲しければコンストラクタに名前をつけておく
+var Myf1 = function myfunc() {}
+var aaa = new Myf1
+aaa.constructor //=> ƒ myfunc() {}
+```
+
 ## データ型
 - JSのデータ型は大きく分けて「基本型(プリミティブ型)」と「参照型(オブジェクト型)」に分類される
 - 基本型と参照型は「値そのものを扱うのか、値の格納されているアドレスを扱うのか」が異なる
@@ -460,6 +533,7 @@ if (r === null) { console.log(123) }
   - 0
   - 空文字("")
   - false
+  - NaN
 
 ## グローバル変数
 - JSでは var を使わずに変数を宣言するとグローバルな変数として宣言されてしまうが、極力グローバル変数などは作らないことが推奨されている
@@ -484,9 +558,6 @@ Hakozaru.getHako() //=> 箱
 
 - 上記例でグローバル変数を一つだけ定義しているが、このグローバル変数の名前を会社名やプロジェクト名などにすれば、ほぼ確実に変数の衝突を回避することが可能
 
-## クロージャ
-- tmp
-
 ## グローバルオブジェクトは変更しない
 - JSでは既存のグローバルオブジェクトに対して操作が行える
 - Rubyのように既存の String などに対しても独自のメソッドが追加できてしまう
@@ -509,9 +580,6 @@ try {
 throw new Error("message") //=> Uncaught Error: message at <anonymous>:1:7
 ```
 
-## Strictモード
-- tmp
-
 ## typeof 演算子
 - 対象のデータ型を調べる演算子
 - JSは動的にデータ型が変化するため、型に応じた処理をしたい場合はこの演算子を使う
@@ -523,11 +591,13 @@ var a = "abc"
 var b = 123
 var c = true
 var d = new String("abc")
+var e = []
 
 typeof a //=> "string"
 typeof b //=> "number"
 typeof c //=> "boolean"
 typeof d //=> "object" (NumberやBooleanでも同じ)
+typeof e //=> "object" (配列もobjectが返る)
 ```
 
 - null は object として判定されるので注意が必要
@@ -572,50 +642,16 @@ var aaa = new hoge()
 aaa instanceof hoge //=> true
 ```
 
-## constructor
-- コンストラクタから生成されたオブジェクトは constructor に生成に使用したコンストラクタ関数を保持している
-  - ちなみに、この constructor はオブジェクトが参照しているコンストラクタ関数のプロトタイププロパティの値として存在する
+## 三項演算子
+- if ~ else に相当する式
 
 ```js
-function Tes() {}
-
-var tes = new Tes
-
-tes.__proto__ //=> {constructor: ƒ}
-Tes.prototype //=> {constructor: ƒ}
-
-tes.__proto__ === Tes.prototype //=> true
-
-tes.constructor //=> ƒ Tes(){}
-Tes.prototype.constructor //=> ƒ Tes(){}
-
-// 以上から、 tes.constructor は Tes.prototype.constructor を参照していることがわかる
-```
-
-- instanceof と異なり、コンストラクタの種類が判定できるため「出所不明」なオブジェクトの詳細を調べる際に使える
-
-```js
-var a = []
-var b = {}
-var c = function() {}
-
-a.constructor //=> ƒ Array() { [native code] }
-b.constructor //=> ƒ Object() { [native code] }
-c.constructor //=> ƒ Function() { [native code] }
-
-// 自作のコンストラクタ
-var Myf1 = function() {}
-var aaa = new Myf1
-aaa.constructor //=> ƒ () {} (無名関数なので名前が表示されない)
-
-// 名前が欲しければコンストラクタに名前をつけておく
-var Myf1 = function myfunc() {}
-var aaa = new Myf1
-aaa.constructor //=> ƒ myfunc() {}
+const result = true ? "true!" : "false"
+console.log(result) // => "true!"
 ```
 
 ## map(連想配列)
-- 以前は連想配列(ハッシュ)はオブジェクトで表現するのが当たり前だったが、ES2015より map がサポートされたことにより map を使用するのが一般的になった
+- 以前は連想配列(ハッシュ)はオブジェクトで表現するのが当たり前だったが、ES6より map がサポートされたことにより map を使用するのが一般的になった
 
 ```js
 var m = new Map()
@@ -634,7 +670,7 @@ m.has("key") //=> true
 ```
 
 ## クラス
-- ES2015でクラスが正式にサポートされた
+- ES6でクラスが正式にサポートされた
 - コンストラクタ内で、 this を介して追加した変数はメンバ変数となる(hoge.nameなどで呼び出し可能)
 - extends で継承が可能
 - クラスメソッドは static で定義する
@@ -673,4 +709,18 @@ user2.name //=> "123"
 user2.getName() //=> "123"
 User2.getClassName() //=> User
 user2.insMethod() //=> "User2のインスタンスメソッド"
+```
+
+## 分割代入(デストラクチャリング)
+- ES6から分割代入が行えるようになった
+
+```js
+const obj = { a: 123, b: 456, c: 789, z: 999 }
+const { a, b, c, d } = obj
+
+a //=> 123
+b //=> 456
+c //=> 789
+d //=> undefined
+z //=> ReferenceError: z is not defined
 ```
