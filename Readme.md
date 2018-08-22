@@ -7,10 +7,10 @@
   - `let`
     - 変数を宣言する。宣言できるのは一度だけ
     - 宣言時に初期化を行わなくてもエラーにはならない(中身はundefinedとなる)
-    - 値の再代入は可能
+    - 値の再代入は可能だが、再宣言はエラーになる
   - `const`
     - 定数を宣言する。宣言と同時に必ず初期化する必要がある
-    - 値の再代入は不可能
+    - 値の再代入も再宣言も不可能
     - 定数名は大文字とアンダースコアを組み合わせた名前を使うことが多い模様
 
 ## 識別子
@@ -69,7 +69,7 @@ obj // => {HOGE: 999, Symbol(): 123}
 - オブジェクトのプロパティとして格納されているのがメソッド
 
 ```js
-var user = {}
+const user = {}
 
 user.name = "ユーザー" //=> 「name」を名前、「ユーザー」を値に持つプロパティ
 user.age = 30 //=> 「age」を名前、「30」を値に持つプロパティ
@@ -101,7 +101,7 @@ function func1(a, b) {
 func1(1, 9) //=> 1 9
 
 // 関数の変数への代入
-var f1 = function() {
+const f1 = function() {
   console.log("あああ")
 }
 
@@ -118,7 +118,7 @@ func2(f1) //=> あああ
 - 通常のオブジェクトと同じ振る舞いが可能なので、メンバを動的に操作可能(非推奨)
 
 ```js
-var f3 = function() {
+const f3 = function() {
   // 特になし
 }
 
@@ -132,7 +132,7 @@ f3.tes //=> 12345
 - 関数は () で処理を呼び出すことができ、 () をつけずに呼び出すと定義の内容を参照することができる
 
 ```js
-var f4 = function() {
+const f4 = function() {
   console.log("かんすう")
 }
 
@@ -154,12 +154,12 @@ function Test(a, b) {
   this.b = b
 }
 
-var aaa = new Test(1, 2)
+const aaa = new Test(1, 2)
 aaa //=> Test {a: 1, b: 2}
 aaa.a //=> 1
 aaa.b //=> 2
 
-var bbb = Test()
+const bbb = Test()
 bbb //=> undefined
 ```
 
@@ -256,7 +256,7 @@ hoge(1,2,3,4,5) //=> 1 2 3 4 5
 - 複数回呼び出すことのない関数を定義する際に利用することが多い
 
 ```js
-function 〇〇() { console.log(111) } //=> この〇〇がない関数
+const func = function() { console.log(111) }
 ```
 
 ## コールバック
@@ -278,7 +278,7 @@ func8(function() {
 ```
 
 ## 巻き上げ(var変数)
-- 関数内のどの位置でも var を使って変数宣言ができるが、これらの変数宣言は関数内のいかなる場所で宣言されたとしても「関数の先頭で宣言された」とみなされること
+- 関数内のどの位置でも `var` を使って変数宣言ができるが、これらの変数宣言は関数内のいかなる場所で宣言されたとしても「関数の先頭で宣言された」とみなされること
 - あくまで巻き上げられるのは宣言のみで、値の代入は巻き上げられない
 - これに対して `let` は宣言をするまでは存在しない(宣言前にアクセスしようとするとエラーとなる)
 
@@ -372,12 +372,12 @@ obj2.speak() //=> "私の名前はさとうです"
 ```
 
 ## thisの束縛(applyとcall)
-- 関数には apply と call と言うメソッドが用意されている
-- それぞれ関数内で参照する this を束縛するためのメソッド
-- this は呼び出した時の状況によって参照先が変化するが、これらのメソッドを使用することにより、常に指定したものを this として動作させることができる
+- 関数には `apply` と `call` と言うメソッドが用意されている
+- それぞれ関数内で参照する `this` を束縛するためのメソッド
+- this は呼び出した時の状況によって参照先が変化するが、これらのメソッドを使用することにより、常に指定したものを `this` として動作させることができる
 
 ```js
-var val = 1
+const val = 1
 
 function func11(a, b) {
   console.log(this.val + a + b)
@@ -385,7 +385,7 @@ function func11(a, b) {
 
 func11(3, 6) //=> 10 (this.val はグローバル変数のvalを参照)
 
-var val2 = { val: 5 }
+const val2 = { val: 5 }
 
 func11.apply(val2, [6, 1]) //=> 12 (this.val は val2 の val を参照している)
 func11.call(val2, 6, 1) //=> 12
@@ -401,9 +401,9 @@ function func12(a, b) {
   console.log(this.val + a + b)
 }
 
-var bind1 = func12.bind({val: 1})
-var bind2 = func12.bind({val: 5}, 5)
-var bind3 = func12.bind({val: 2}, 6, 9)
+const bind1 = func12.bind({val: 1})
+const bind2 = func12.bind({val: 5}, 5)
+const bind3 = func12.bind({val: 2}, 6, 9)
 
 bind1(1, 2) //=> 4 (1 + 1 + 2)
 bind2(3) //=> 13 (5 + 5 + 3)
@@ -425,7 +425,7 @@ function User(name, age) { //=> コンストラクタ
   this.age = age
 }
 
-var u1 = new User("ユーザー1", 24)
+const u1 = new User("ユーザー1", 24)
 u1 //=> User {name: "ユーザー1", age: 24}
 ```
 
@@ -441,7 +441,7 @@ function User(name, age) { //=> コンストラクタ
   }
 }
 
-var usr1 = new User(123, 99) //=> User {name: 123, age: 99, getName: ƒ}
+const usr1 = new User(123, 99) //=> User {name: 123, age: 99, getName: ƒ}
 usr1.getName() //=> "123"
 ```
 
@@ -458,7 +458,7 @@ User.prototype.getName = function() {
   return this.name
 }
 
-var usr = new User("ggg", 78) //=> User {name: "ggg", age: 78}
+const usr = new User("ggg", 78) //=> User {name: "ggg", age: 78}
 usr.getName() //=> "ggg"
 ```
 
@@ -471,7 +471,7 @@ usr.getName() //=> "ggg"
 ```js
 function Tes() {}
 
-var tes = new Tes
+const tes = new Tes
 
 tes.__proto__ //=> {constructor: ƒ}
 Tes.prototype //=> {constructor: ƒ}
@@ -487,22 +487,22 @@ Tes.prototype.constructor //=> ƒ Tes(){}
 - instanceof と異なり、コンストラクタの種類が判定できるため「出所不明」なオブジェクトの詳細を調べる際に使える
 
 ```js
-var a = []
-var b = {}
-var c = function() {}
+const a = []
+const b = {}
+const c = function() {}
 
 a.constructor //=> ƒ Array() { [native code] }
 b.constructor //=> ƒ Object() { [native code] }
 c.constructor //=> ƒ Function() { [native code] }
 
 // 自作のコンストラクタ
-var Myf1 = function() {}
-var aaa = new Myf1
+const Myf1 = function() {}
+const aaa = new Myf1
 aaa.constructor //=> ƒ () {} (無名関数なので名前が表示されない)
 
 // 名前が欲しければコンストラクタに名前をつけておく
-var Myf1 = function myfunc() {}
-var aaa = new Myf1
+const Myf1 = function myfunc() {}
+const aaa = new Myf1
 aaa.constructor //=> ƒ myfunc() {}
 ```
 
@@ -523,14 +523,14 @@ aaa.constructor //=> ƒ myfunc() {}
 
 ```js
 // 通常はこう使う
-var a = 123
-var b = "aiu"
-var c = true
+const a = 123
+const b = "aiu"
+const c = true
 
 // このような使用は通常避けるべき
-var a2 = new Number(123)
-var b2 = new String("aiu")
-var c2 = new Boolean(true)
+const a2 = new Number(123)
+const b2 = new String("aiu")
+const c2 = new Boolean(true)
 ```
 
 - なぜそれぞれオブジェクトが存在しているのか？
@@ -576,7 +576,7 @@ a.toString() //=> "123"
   - ドットまたはブラケットでアクセスが可能
 
 ```js
-var obj = { a: 1, b: 2, c: 3 }
+const obj = { a: 1, b: 2, c: 3 }
 
 obj.a //=> 1
 obj["b"] //=> 2
@@ -593,7 +593,7 @@ obj["b"] //=> 2
 - 変数が null または undefined であるかの確認は、単純な同値比較( === )を使えばよい
 
 ```js
-var r
+let r
 if (r === undefined) { console.log(123) }
 //=> 123
 
@@ -620,7 +620,7 @@ if (r === null) { console.log(123) }
 - JSには他言語のように仕組みが存在するわけではなく、オブジェクトを利用してそれらと同等の仕組みを実現している
 
 ```js
-var Hakozaru = {} //=> グローバル変数を定義
+const Hakozaru = {} //=> グローバル変数を定義
 
 Hakozaru.tes = "test!"
 Hakozaru.tes //=> "test!"
@@ -663,11 +663,11 @@ throw new Error("message") //=> Uncaught Error: message at <anonymous>:1:7
 - 結論からいうと「文字列、数値、真偽値のプリミティブ値に対してのみ使用すべき」
 
 ```js
-var a = "abc"
-var b = 123
-var c = true
-var d = new String("abc")
-var e = []
+const a = "abc"
+const b = 123
+const c = true
+const d = new String("abc")
+const e = []
 
 typeof a //=> "string"
 typeof b //=> "number"
@@ -679,8 +679,8 @@ typeof e //=> "object" (配列もobjectが返る)
 - null は object として判定されるので注意が必要
 
 ```js
-var t = null
-var z = undefined
+const t = null
+const z = undefined
 
 typeof t //=> "object"
 typeof z //=> "undefined"
@@ -698,9 +698,9 @@ typeof function() {} //=> "object"
 - オブジェクトが何のコンストラクタから生成されたかを判定する
 
 ```js
-var a = {}
-var b = []
-var c = function() {}
+const a = {}
+const b = []
+const c = function() {}
 
 a instanceof Object //=> true
 b instanceof Array //=> true
@@ -712,8 +712,8 @@ c instanceof Function //=> true
 - 自作のコンストラクタも判定可能
 
 ```js
-var hoge = function() {}
-var aaa = new hoge()
+const hoge = function() {}
+const aaa = new hoge()
 
 aaa instanceof hoge //=> true
 ```
@@ -730,7 +730,7 @@ console.log(result) // => "true!"
 - 以前は連想配列(ハッシュ)はオブジェクトで表現するのが当たり前だったが、ES6より map がサポートされたことにより map を使用するのが一般的になった
 
 ```js
-var m = new Map()
+const m = new Map()
 
 m.set("key", "value") //=> Map(1) {"key" => "value"}
 m.get("key") //=> "value"
@@ -768,7 +768,7 @@ class User {
   }
 }
 
-var user = new User("たなかたろう")
+const user = new User("たなかたろう")
 user.name //=> "たなかたろう"
 user.getName() //=> "たなかたろう"
 User.getClassName() //=> "User"
@@ -780,7 +780,7 @@ class User2 extends User {
   }
 }
 
-var user2 = new User2("123")
+const user2 = new User2("123")
 user2.name //=> "123"
 user2.getName() //=> "123"
 User2.getClassName() //=> User
